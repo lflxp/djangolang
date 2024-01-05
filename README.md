@@ -135,7 +135,7 @@ Django-Golang 的配置选项非常丰富，可以根据自己的需求进行自
 
 ## 完整演示项目
 
-参考 [djangolangexamples](github.com/lflxp/djangolangexamples)
+参考 [djangolangexamples](https://github.com/lflxp/djangolangexamples)
 
 # 功能详情
 
