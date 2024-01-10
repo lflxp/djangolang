@@ -1,5 +1,9 @@
 # 介绍
 
+![first](assets/first.png)
+![second](assets/second.png)
+![three](assets/three.png)
+
 `本项目的目的是利用django的admin设计模式 + gin + golang实现应用的快读搭建和使用，免去搭建底层框架的困扰，自动生成CRUD的界面，节能增效`
 
 Django 是一款流行的 Python Web 框架，提供了丰富的功能和灵活的配置选项，使得开发者可以快速地构建高质量、可扩展的 Web 应用程序。而 Golang 版本的 Django 框架 Django-Golang，则是将 Django 框架用 Golang 语言重新实现的一个版本，具有更高的运行时性能和更好的并发支持。
