@@ -72,7 +72,7 @@ type User struct {
 	Status    string   `xorm:"status" name:"status" verbose_name:"状态" list:"true" search:"false" colType:"radio" radio:"有效|1,无效|0"`
 	IsAdmin   string   `xorm:"isadmin" name:"isadmin" verbose_name:"超级用户状态" list:"true" search:"false" colType:"radio" radio:"是|1,不是|0"`
 	Claims    []Claims `xorm:"claims_id int(11)" colType:"o2m" o2m:"claims|id,auth,type,value" verbose_name:"权限配置" name:"claims_id"`
-	Token     string   `xorm:"token" name:"token" verbose_name:"rancher token"`
+	Token     string   `xorm:"token" name:"token" verbose_name:"token"`
 }
 
 // 用户权限表

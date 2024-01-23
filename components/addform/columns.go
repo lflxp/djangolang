@@ -90,6 +90,9 @@ jQuery(function($){
 }
 
 var addFuncMap = map[orm.FieldType]func(string, []string) string{
+	orm.Password: func(text string, tmp []string) string {
+		return strings.Replace(strings.Replace(strings.Replace(text, "$NAME", tmp[2], -1), "$LABELS", tmp[0], -1), "$TYPE", "password", -1)
+	},
 	orm.StringField: func(text string, tmp []string) string {
 		return strings.Replace(strings.Replace(strings.Replace(text, "$NAME", tmp[2], -1), "$LABELS", tmp[0], -1), "$TYPE", "text", -1)
 	},

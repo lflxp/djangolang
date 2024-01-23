@@ -1,0 +1,255 @@
+definitions:
+  model.Demo:
+    properties:
+      company:
+        type: string
+      count:
+        type: string
+      country:
+        type: string
+      detail:
+        type: string
+      extend:
+        type: string
+      file2:
+        type: string
+      files:
+        type: string
+      id:
+        type: integer
+      items:
+        type: string
+      production:
+        type: string
+      serial:
+        type: string
+      times:
+        type: string
+      type:
+        type: string
+      zoom:
+        type: string
+    type: object
+  model.Vpn:
+    properties:
+      id:
+        type: integer
+      ip:
+        type: string
+      name:
+        type: string
+      vpn:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /apis/v1/{id}/demo:
+    delete:
+      description: 删除数据
+      parameters:
+      - description: 要删除的数据id
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: success
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: 删除数据
+      tags:
+      - Demo
+    get:
+      description: 根据id查询数据
+      parameters:
+      - description: 要删除的数据id
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: success
+          schema:
+            $ref: '#/definitions/model.Demo'
+      security:
+      - ApiKeyAuth: []
+      summary: 根据id查询数据
+      tags:
+      - Demo
+    put:
+      description: 修改数据
+      parameters:
+      - description: 数据id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: 修改数据
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/model.Demo'
+      responses:
+        "200":
+          description: success
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: 修改数据
+      tags:
+      - Demo
+  /apis/v1/{id}/vpn:
+    delete:
+      description: 删除数据
+      parameters:
+      - description: 要删除的数据id
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: success
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: 删除数据
+      tags:
+      - Vpn
+    get:
+      description: 根据id查询数据
+      parameters:
+      - description: 要删除的数据id
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: success
+          schema:
+            $ref: '#/definitions/model.Vpn'
+      security:
+      - ApiKeyAuth: []
+      summary: 根据id查询数据
+      tags:
+      - Vpn
+    put:
+      description: 修改数据
+      parameters:
+      - description: 数据id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: 修改数据
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/model.Vpn'
+      responses:
+        "200":
+          description: success
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: 修改数据
+      tags:
+      - Vpn
+  /apis/v1/demo:
+    get:
+      description: 查询所有数据
+      parameters:
+      - description: 页数
+        in: query
+        name: page
+        type: string
+      - description: 每页大小
+        in: query
+        name: pagesize
+        type: string
+      responses:
+        "200":
+          description: success
+          schema:
+            items:
+              $ref: '#/definitions/model.Demo'
+            type: array
+      security:
+      - ApiKeyAuth: []
+      summary: 查询所有数据
+      tags:
+      - Demo
+    post:
+      description: 新增数据
+      parameters:
+      - description: '工作空间数据 注意命名规范: Demo-ide-* | Demo-devfile-*'
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/model.Demo'
+      responses:
+        "200":
+          description: success
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: 新增数据
+      tags:
+      - Demo
+  /apis/v1/vpn:
+    get:
+      description: 查询所有数据
+      parameters:
+      - description: 页数
+        in: query
+        name: page
+        type: string
+      - description: 每页大小
+        in: query
+        name: pagesize
+        type: string
+      responses:
+        "200":
+          description: success
+          schema:
+            items:
+              $ref: '#/definitions/model.Vpn'
+            type: array
+      security:
+      - ApiKeyAuth: []
+      summary: 查询所有数据
+      tags:
+      - Vpn
+    post:
+      description: 新增数据
+      parameters:
+      - description: 新增数据
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/model.Vpn'
+      responses:
+        "200":
+          description: success
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: 新增数据
+      tags:
+      - Vpn
+swagger: "2.0"

@@ -16,6 +16,8 @@ import (
 	"github.com/gin-contrib/gzip"
 	"github.com/gin-gonic/gin"
 	log "github.com/go-eden/slf4go"
+	"github.com/lflxp/djangolang/examples/allinone/demo"
+	_ "github.com/lflxp/djangolang/examples/allinone/docs"
 	"github.com/skratchdot/open-golang/open"
 )
 
@@ -48,7 +50,12 @@ func Run(args *Args) {
 	GinEngine.GET("/", func(c *gin.Context) {
 		c.Redirect(301, "/admin/index")
 	})
+	// 设置swagger
+	middlewares.RegisterSwaggerMiddleware(GinEngine)
+	middlewares.RegisterNodeExporter(GinEngine)
 	Registertest(GinEngine)
+	demo.RegisterDemo(GinEngine)
+	demo.RegisterVpn(GinEngine)
 	djangolang.RegisterControllerAdmin(GinEngine)
 	log.Infof("ip %s port %s", args.Host, args.Port)
 

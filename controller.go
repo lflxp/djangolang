@@ -57,8 +57,12 @@ func RegisterControllerAdmin(router *gin.Engine) {
 	router.NoRoute(middlewares.NoRouteHandler)
 	// form upload serve
 	router.StaticFS("/upload", http.Dir("upload"))
+	// 默认开启jwt认证
+	middlewares.RegisterJWT(router)
 	// admin路由
+	var authMiddleware = middlewares.NewGinJwtMiddlewares(middlewares.AllUserAuthorizator)
 	adminGroup := router.Group("/admin")
+	adminGroup.Use(authMiddleware.MiddlewareFunc())
 	// adminGroup.Use(authMiddleware.MiddlewareFunc())
 	{
 		adminGroup.Any("/:type", process)
@@ -247,6 +251,7 @@ func process(c *gin.Context) {
 			// 获取字段类型
 			columnsType := map[string]string{}
 			for _, v := range strings.Split(strings.TrimSpace(searchs["Col"]), " ") {
+				// log.Infof("vvvv is %s", v)
 				tmp := strings.Split(strings.TrimSpace(v), ":")
 				columnsType[strings.ToLower(tmp[2])] = tmp[1]
 			}

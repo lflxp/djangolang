@@ -27,6 +27,8 @@ func (a *AddForm) Transfer() interface{} {
 			// 移除id字段在form表单添加和修改的时候
 			if tmp[2] != "id" {
 				switch tmp[1] {
+				case string(orm.Password):
+					result += a.GetFunc(orm.Password)(a.GetTemplate(orm.Text), tmp)
 				case string(orm.StringField):
 					result += a.GetFunc(orm.StringField)(a.GetTemplate(orm.Text), tmp)
 				case string(orm.IntField):

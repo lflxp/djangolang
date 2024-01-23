@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/lflxp/djangolang/middlewares"
 	"github.com/lflxp/djangolang/model/test"
+	"github.com/lflxp/djangolang/utils"
 
 	"github.com/lflxp/djangolang/utils/orm/sqlite"
 
@@ -14,8 +16,14 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+func init() {
+	djangolang.RegisterAdmin(new(test.Demotest))
+}
+
 func Registertest(router *gin.Engine) {
+	var authMiddleware = middlewares.NewGinJwtMiddlewares(middlewares.AllUserAuthorizator)
 	testGroup := router.Group("/test")
+	testGroup.Use(authMiddleware.MiddlewareFunc())
 	{
 		testGroup.Any("/:type", test_process)
 	}
@@ -46,9 +54,10 @@ func test_process(c *gin.Context) {
 				if !has {
 					c.String(404, "not found")
 				} else {
-					c.HTML(200, "test/show.html", gin.H{
-						"Data": tmp,
-					})
+					// c.HTML(200, "test/show.html", gin.H{
+					// 	"Data": tmp,
+					// })
+					utils.SendSuccessMessage(c, 200, tmp)
 				}
 			}
 		}

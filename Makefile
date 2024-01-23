@@ -1,5 +1,5 @@
 run:
-	cd examples && go run example.go
+	cd examples/allinone && go run main.go test_controller.go
 
 swag:
 	swag init --parseDependency --parseDepth=1
