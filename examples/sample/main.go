@@ -35,6 +35,6 @@ func main() {
 		c.Redirect(301, "/admin/index")
 	})
 
-	djangolang.RegisterControllerAdmin(r)
+	djangolang.RegisterControllerAdmin(r, false)
 	r.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
 }

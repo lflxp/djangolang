@@ -50,19 +50,23 @@ func init() {
 	}
 }
 
-func RegisterControllerAdmin(router *gin.Engine) {
+// @param router => *gin.Engine
+// @param isJwt => bool 是否开启jwt认证模式
+func RegisterControllerAdmin(router *gin.Engine, isJwt bool) {
 	// 注册模版
 	RegisterTemplate(router)
 	// 默认跳转
 	router.NoRoute(middlewares.NoRouteHandler)
 	// form upload serve
 	router.StaticFS("/upload", http.Dir("upload"))
-	// 默认开启jwt认证
-	middlewares.RegisterJWT(router)
 	// admin路由
-	var authMiddleware = middlewares.NewGinJwtMiddlewares(middlewares.AllUserAuthorizator)
 	adminGroup := router.Group("/admin")
-	adminGroup.Use(authMiddleware.MiddlewareFunc())
+	if isJwt {
+		// 默认开启jwt认证
+		middlewares.RegisterJWT(router)
+		var authMiddleware = middlewares.NewGinJwtMiddlewares(middlewares.AllUserAuthorizator)
+		adminGroup.Use(authMiddleware.MiddlewareFunc())
+	}
 	// adminGroup.Use(authMiddleware.MiddlewareFunc())
 	{
 		adminGroup.Any("/:type", process)

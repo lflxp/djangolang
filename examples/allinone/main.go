@@ -56,7 +56,7 @@ func Run(args *Args) {
 	Registertest(GinEngine)
 	demo.RegisterDemo(GinEngine)
 	demo.RegisterVpn(GinEngine)
-	djangolang.RegisterControllerAdmin(GinEngine)
+	djangolang.RegisterControllerAdmin(GinEngine, true)
 	log.Infof("ip %s port %s", args.Host, args.Port)
 
 	if args.Host == "" {
