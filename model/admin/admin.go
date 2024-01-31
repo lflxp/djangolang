@@ -3,11 +3,10 @@ package admin
 import (
 	"encoding/json"
 	"fmt"
+	"log/slog"
 	"time"
 
 	"github.com/lflxp/djangolang/utils/orm/sqlite"
-
-	log "github.com/go-eden/slf4go"
 )
 
 /*
@@ -102,7 +101,7 @@ func InsertHistory(beans ...interface{}) (int64, error) {
 	defer func() {
 		data, err := json.Marshal(beans)
 		if err != nil {
-			log.Error(err)
+			slog.Error(err.Error())
 			return
 		}
 		info := History{
@@ -112,7 +111,7 @@ func InsertHistory(beans ...interface{}) (int64, error) {
 		}
 		_, err = AddHistory(&info)
 		if err != nil {
-			log.Error(err)
+			slog.Error(err.Error())
 		}
 
 	}()

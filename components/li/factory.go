@@ -2,10 +2,9 @@ package li
 
 import (
 	"fmt"
+	"log/slog"
 	"sort"
 	"strings"
-
-	log "github.com/go-eden/slf4go"
 )
 
 // string转html
@@ -18,7 +17,7 @@ func (s *Li) Transfer() interface{} {
 	return func(info []map[string]string) string {
 		var result string
 		if err := s.Check(info); err != nil {
-			log.Error(err)
+			slog.Error(err.Error())
 			return err.Error()
 		}
 

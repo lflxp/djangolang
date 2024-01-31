@@ -7,8 +7,9 @@ import (
 	"github.com/lflxp/djangolang/examples/allinone/demo/controller"
 	"github.com/lflxp/djangolang/examples/allinone/demo/model"
 
+	"log/slog"
+
 	"github.com/gin-gonic/gin"
-	log "github.com/go-eden/slf4go"
 	"github.com/lflxp/djangolang/utils"
 )
 
@@ -26,19 +27,19 @@ func GetAllDemo(c *gin.Context) {
 	if page != "" && size != "" {
 		pageInt, err := strconv.Atoi(page)
 		if err != nil {
-			log.Error("数据转换错误", err.Error())
+			slog.Error("数据转换错误", err.Error())
 			utils.SendErrorMessage(c, 500, "DemoError", err.Error())
 			return
 		}
 		pagesizeInt, err := strconv.Atoi(size)
 		if err != nil {
-			log.Error("数据转换错误", err.Error())
+			slog.Error("数据转换错误", err.Error())
 			utils.SendErrorMessage(c, 500, "DemoError", err.Error())
 			return
 		}
 		data, err := controller.PageDemo(pageInt, pagesizeInt)
 		if err != nil {
-			log.Error("获取数据失败", err.Error())
+			slog.Error("获取数据失败", err.Error())
 			utils.SendErrorMessage(c, 500, "DemoError", err.Error())
 			return
 		}
@@ -47,7 +48,7 @@ func GetAllDemo(c *gin.Context) {
 	}
 	list, err := controller.ListDemo()
 	if err != nil {
-		log.Error("获取数据失败", err.Error())
+		slog.Error("获取数据失败", err.Error())
 		utils.SendErrorMessage(c, 500, "DemoError", err.Error())
 		return
 	}
@@ -70,13 +71,13 @@ func GetDemoById(c *gin.Context) {
 	}
 	data, exist, err := controller.GetByUUIDDemo(id)
 	if err != nil {
-		log.Error("获取数据失败", err.Error())
+		slog.Error("获取数据失败", err.Error())
 		utils.SendErrorMessage(c, 500, "DemoError", err.Error())
 		return
 	}
 
 	if !exist {
-		log.Errorf("id %s 数据不存在", id)
+		slog.Error("id %s 数据不存在", id)
 		utils.SendErrorMessage(c, 500, "DemoError", fmt.Sprintf("id %s 数据不存在", id))
 		return
 	}
@@ -94,7 +95,7 @@ func GetDemoById(c *gin.Context) {
 func CreateDemo(c *gin.Context) {
 	var data model.Demo
 	if err := c.BindJSON(&data); err != nil {
-		log.Error(err.Error())
+		slog.Error(err.Error())
 		utils.SendErrorMessage(c, 400, "DemoPostError", err.Error())
 		return
 	}
@@ -147,7 +148,7 @@ func PutDemo(c *gin.Context) {
 	}
 	var data model.Demo
 	if err := c.BindJSON(&data); err != nil {
-		log.Error(err.Error())
+		slog.Error(err.Error())
 		utils.SendErrorMessage(c, 400, "DemoPutError", err.Error())
 		return
 	}

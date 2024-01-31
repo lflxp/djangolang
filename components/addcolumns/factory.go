@@ -2,9 +2,8 @@ package addcolumns
 
 import (
 	"errors"
+	"log/slog"
 	"strings"
-
-	log "github.com/go-eden/slf4go"
 )
 
 // string转html
@@ -15,13 +14,13 @@ type AddColumns struct {
 func (a *AddColumns) Transfer() interface{} {
 	return func(data map[string]string) string {
 		if err := a.Check(data); err != nil {
-			log.Error(err)
+			slog.Error(err.Error())
 			return err.Error()
 		}
 		col := strings.TrimSpace(data["List"]) + " 操作"
 		result, err := DirectJson(strings.Split(col, " ")...)
 		if err != nil {
-			log.Error(err)
+			slog.Error(err.Error())
 			return err.Error()
 		}
 		return result

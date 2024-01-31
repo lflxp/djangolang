@@ -2,6 +2,7 @@ package middlewares
 
 import (
 	"fmt"
+	"log/slog"
 	"regexp"
 	"strings"
 	"time"
@@ -13,7 +14,6 @@ import (
 	"github.com/lflxp/djangolang/utils"
 
 	"github.com/gin-gonic/gin"
-	log "github.com/go-eden/slf4go"
 )
 
 const (
@@ -69,7 +69,7 @@ const (
 // func TokenFilter() gin.HandlerFunc {
 // 	return func(c *gin.Context) {
 // 		// token := jwt.ExtractClaims(c)
-// 		// log.Debug("ExtractClaims token ", token)
+// 		// slog.Debug("ExtractClaims token ", token)
 
 // 		if !isWhilteUrl(c) {
 // 			user, err := js.ParseJWTToken(c)
@@ -134,7 +134,7 @@ func isWhilteUrl(c *gin.Context) bool {
 		}
 	}
 
-	log.Debugf("method [%s] isWhite %v path %s Url.Path %s ", c.Request.Method, rs, c.Request.RequestURI, c.Request.URL.Path)
+	slog.Debug("method [%s] isWhite %v path %s Url.Path %s ", c.Request.Method, rs, c.Request.RequestURI, c.Request.URL.Path)
 	return rs
 }
 
@@ -171,17 +171,17 @@ func isRolePermission(c *gin.Context) (bool, error) {
 			// isPart3 = true
 			fullpath = c.Request.Header.Get(XForwardedUri)
 			method = c.Request.Header.Get(XForwardedMethod)
-			// log.Debugf("探测鉴权接口: URLCACHE_FORWARDAUTH %s fullpath %s method %s Request %v", c.FullPath(), fullpath, method, c.Request.Header)
+			// slog.Debugf("探测鉴权接口: URLCACHE_FORWARDAUTH %s fullpath %s method %s Request %v", c.FullPath(), fullpath, method, c.Request.Header)
 			// TODO: 跨平台接口需要支持正则表达式校验，否则接口太多
 			found, err := regexp.MatchString(v.Path, fullpath)
 			if err != nil {
-				log.Error(err)
+				slog.Error(err.Error())
 				return false, err
 			}
 			if found && strings.EqualFold(v.Method, method) {
 				group = v.Group
 				urlCode = v.Name
-				log.Debugf("==鉴权接口==》%s://%s%s method %s Name %s", c.GetHeader(XForwardedProto), c.GetHeader(XForwardedHost), fullpath, method, urlCode)
+				slog.Debug("==鉴权接口==》", "URL", fmt.Sprintf("%s://%s%s method %s Name %s", c.GetHeader(XForwardedProto), c.GetHeader(XForwardedHost), fullpath, method, urlCode))
 				break
 			}
 		} else {
@@ -192,12 +192,12 @@ func isRolePermission(c *gin.Context) (bool, error) {
 				urlCode = v.Name
 				break
 			}
-			// log.Debugf("AAA => %v", c.Request.Header)
+			// slog.Debugf("AAA => %v", c.Request.Header)
 		}
 	}
 
 	if group == "" {
-		log.Error(fmt.Sprintf("获取CacheUrl数据失败：[%s %s] url not found", method, fullpath))
+		slog.Error(fmt.Sprintf("获取CacheUrl数据失败：[%s %s] url not found", method, fullpath))
 		c.Request.Header.Set("ErrorCode", utils.LicenseError)
 		c.Request.Header.Set("ErrorMessage", fmt.Sprintf("获取CacheUrl数据失败：[%s %s] url not found", method, fullpath))
 		return false, fmt.Errorf(fmt.Sprintf("获取CacheUrl数据失败：[%s %s] url not found", method, fullpath))
@@ -242,7 +242,7 @@ func isRolePermission(c *gin.Context) (bool, error) {
 		// 验证平台级非超级管理员角色
 		if platformRole != "" {
 			if PlatformAPIS, ok := utils.NewCacheCliWithTTL().Get(fmt.Sprintf("%s-RRR", platformRole)); !ok {
-				log.Error(fmt.Sprintf("用户 %s 平台级角色 %s 不存在", username, platformRole))
+				slog.Error(fmt.Sprintf("用户 %s 平台级角色 %s 不存在", username, platformRole))
 				return false, fmt.Errorf("用户 %s 平台级角色 %s 不存在", username, platformRole)
 			} else {
 				if utils.ContainsString(PlatformAPIS.([]string), urlCode) {
@@ -255,7 +255,7 @@ func isRolePermission(c *gin.Context) (bool, error) {
 			if projectRole != "" {
 				// 验证项目级角色
 				if ProjectAPIS, ok := utils.NewCacheCliWithTTL().Get(fmt.Sprintf("%s-RRR", projectRole)); !ok {
-					log.Error(fmt.Sprintf("用户 %s 项目级角色 %s 不存在", username, projectRole))
+					slog.Error(fmt.Sprintf("用户 %s 项目级角色 %s 不存在", username, projectRole))
 					return false, fmt.Errorf("用户 %s 项目级角色 %s 不存在", username, projectRole)
 				} else {
 					if utils.ContainsString(ProjectAPIS.([]string), urlCode) {

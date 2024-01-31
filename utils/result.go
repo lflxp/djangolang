@@ -3,12 +3,12 @@ package utils
 import (
 	"encoding/json"
 	"fmt"
+	"log/slog"
 	"net/http"
 	"strconv"
 	"strings"
 
 	"github.com/gin-gonic/gin"
-	"github.com/sirupsen/logrus"
 )
 
 // request fail
@@ -152,7 +152,7 @@ func PkgResp(c *gin.Context, code int, result Result) {
 }
 
 func CliErr(err error) Result {
-	logrus.Errorf("get rancher v3-default client error: %s", err.Error())
+	slog.Error("get rancher v3-default client error", "Error", err.Error())
 	return Result{
 		Data:         err.Error(),
 		Success:      false,

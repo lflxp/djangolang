@@ -3,6 +3,7 @@ package middlewares
 import (
 	"errors"
 	"fmt"
+	"log/slog"
 	"net/http"
 	"strings"
 	"time"
@@ -17,7 +18,6 @@ import (
 
 	jwt "github.com/appleboy/gin-jwt/v2"
 	"github.com/gin-gonic/gin"
-	log "github.com/go-eden/slf4go"
 )
 
 var (
@@ -99,8 +99,8 @@ func VerifyAuth(username, password string) (bool, error) {
 	has, _ := sqlite.NewOrm().Get(&user)
 
 	if has {
-		log.Debugf("Found User %s Login", username)
-		log.Infof("password %s %s %s", user.Password, utils.MD5(password), password)
+		slog.Debug("Found User %s Login", username)
+		slog.Info("password %s %s %s", user.Password, utils.MD5(password), password)
 		// if user.Password == utils.MD5(password) {
 		if user.Password == password {
 			return true, nil
@@ -136,9 +136,9 @@ func VerifyAuth(username, password string) (bool, error) {
 func VerifyAuthByRancher(username, password string) (string, string, bool) {
 	// rancherHost := viper.GetString("rancher.host")
 	rancherHost := "127.0.0.1"
-	log.Infof("初始化RancherHost地址 %s", rancherHost)
+	slog.Info("初始化RancherHost地址 %s", rancherHost)
 	url := fmt.Sprintf("%s/v3-public/localProviders/local?action=login", rancherHost)
-	log.Debugf("url is %s", url)
+	slog.Debug("url is %s", url)
 	code := 0
 	body := ""
 	header := make(http.Header)
@@ -161,22 +161,22 @@ func VerifyAuthByRancher(username, password string) (string, string, bool) {
 		Do()
 
 	if err != nil {
-		log.Error(err.Error())
+		slog.Error(err.Error())
 		return "", "", false
 	}
 
 	if code != 200 {
-		log.Error(body)
+		slog.Error(body)
 		return "", "", false
 	}
 
 	ress := header.Get("Set-Cookie")
 	if ress == "" {
-		log.Error("no token found")
+		slog.Error("no token found")
 		return "", "", false
 	}
 
-	log.Debugf("Ress is %s", ress)
+	slog.Debug("Ress is %s", ress)
 	var rs string
 	for _, t := range strings.Split(ress, ";") {
 		if strings.Contains(t, "R_SESS") {
@@ -185,7 +185,7 @@ func VerifyAuthByRancher(username, password string) (string, string, bool) {
 		}
 	}
 	if rs == "" {
-		log.Error("no R_SESS found")
+		slog.Error("no R_SESS found")
 		return "", "", false
 	}
 	return rs, ress, true
@@ -208,7 +208,7 @@ func NewGinJwtMiddlewares(jwta JwtAuthorizator) *jwt.GinJWTMiddleware {
 			if v, ok := data.(*User); ok {
 				// claimJson, err := GetUserClaims(v.Username)
 				// if err != nil {
-				// 	log.Error(err.Error())
+				// 	slog.Error(err.Error())
 				// }
 				// maps the claims in the JWT
 				return jwt.MapClaims{
@@ -226,7 +226,7 @@ func NewGinJwtMiddlewares(jwta JwtAuthorizator) *jwt.GinJWTMiddleware {
 		},
 		IdentityHandler: func(c *gin.Context) interface{} {
 			claims := jwt.ExtractClaims(c)
-			// log.Error("claims ", claims)
+			// slog.Error("claims ", claims)
 			//extracts identity from claims
 			// if claims["userName"] != nil {
 			// 	return &User{
@@ -236,7 +236,7 @@ func NewGinJwtMiddlewares(jwta JwtAuthorizator) *jwt.GinJWTMiddleware {
 			// jsonClaim := claims["userClaims"].([]interface{})
 			// data, err := json.Marshal(jsonClaim)
 			// if err != nil {
-			// 	log.Error(err)
+			// 	slog.Error(err)
 			// 	return &User{
 			// 		Username: claims["userName"].(string),
 			// 	}
@@ -249,7 +249,7 @@ func NewGinJwtMiddlewares(jwta JwtAuthorizator) *jwt.GinJWTMiddleware {
 			// 	Username: claims["userName"].(string),
 			// 	Claims:   userClaims,
 			// }
-			log.Debugf("-----------------CLAIMS %v", claims)
+			slog.Debug("-----------------CLAIMS %v", claims)
 			return claims
 		},
 		Authenticator: func(c *gin.Context) (interface{}, error) {
@@ -261,7 +261,7 @@ func NewGinJwtMiddlewares(jwta JwtAuthorizator) *jwt.GinJWTMiddleware {
 			userID := loginVals.Username
 			password := loginVals.Password
 
-			log.Debugf("JWT Authenticator %v username %s password %s", loginVals, userID, password)
+			slog.Debug("JWT Authenticator %v username %s password %s", loginVals, userID, password)
 			// if IsRancherLogin {
 			// 	if token, ress, ok := VerifyAuthByRancher(userID, password); ok {
 			// 		c.Header("Set-Cookie", strings.Replace(ress, "Secure", "", -1))
@@ -277,7 +277,7 @@ func NewGinJwtMiddlewares(jwta JwtAuthorizator) *jwt.GinJWTMiddleware {
 			// 			Token:    "verifyAuth",
 			// 		}, nil
 			// 	} else {
-			// 		log.Error(err.Error())
+			// 		slog.Error(err.Error())
 			// 	}
 			// }
 			if ok, err := VerifyAuth(userID, password); ok {
@@ -286,7 +286,7 @@ func NewGinJwtMiddlewares(jwta JwtAuthorizator) *jwt.GinJWTMiddleware {
 					Token:    "verifyAuth",
 				}, nil
 			} else {
-				log.Error(err.Error())
+				slog.Error(err.Error())
 			}
 
 			return nil, jwt.ErrFailedAuthentication
@@ -329,7 +329,7 @@ func NewGinJwtMiddlewares(jwta JwtAuthorizator) *jwt.GinJWTMiddleware {
 		},
 	})
 	if err != nil {
-		log.Fatal("JWT Error:" + err.Error())
+		slog.Error("JWT Error:" + err.Error())
 	}
 	return authMiddleware
 }

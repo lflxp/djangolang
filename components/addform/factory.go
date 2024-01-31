@@ -2,11 +2,10 @@ package addform
 
 import (
 	"fmt"
+	"log/slog"
 	"strings"
 
 	orm "github.com/lflxp/djangolang/consted"
-
-	log "github.com/go-eden/slf4go"
 )
 
 type AddForm struct{}
@@ -15,11 +14,11 @@ func (a *AddForm) Transfer() interface{} {
 	return func(data map[string]string) string {
 		var result string
 		if err := a.Check(data); err != nil {
-			log.Error(err.Error())
+			slog.Error(err.Error())
 			return ""
 		}
 
-		log.Debugf("Col formcolumns %v", data)
+		slog.Debug("Col formcolumns %v", data)
 		args := data["Col"]
 
 		for _, info := range strings.Split(strings.TrimSpace(args), " ") {
@@ -54,7 +53,7 @@ func (a *AddForm) Transfer() interface{} {
 				case string(orm.OneToMany):
 					result += a.GetFunc(orm.OneToMany)(a.GetTemplate(orm.MultiSelect), tmp)
 				default:
-					log.Errorf("unsupport Columns Type: %s", tmp[1])
+					slog.Error("unsupport Columns Type", "Type", tmp[1])
 				}
 			}
 		}
@@ -65,16 +64,16 @@ func (a *AddForm) Transfer() interface{} {
 // 检查并赋值参数
 func (a *AddForm) Check(data map[string]string) error {
 	if value, ok := data["Col"]; ok {
-		log.Debug("Col ", value)
+		slog.Debug("Col ", "Value", value)
 	} else {
 		return fmt.Errorf("Col is empty")
 	}
 
 	if value, ok := data["List"]; ok {
-		log.Debug("List ", value)
+		slog.Debug("List ", value)
 	}
 	if value, ok := data["Search"]; ok {
-		log.Debug("Search ", value)
+		slog.Debug("Search ", value)
 	}
 
 	return nil
@@ -83,7 +82,7 @@ func (a *AddForm) Check(data map[string]string) error {
 func (a *AddForm) GetTemplate(t orm.FieldType) string {
 	column, ok := addColumns[t]
 	if !ok {
-		log.Error("模板字段 %v 不存在", t)
+		slog.Error("模板字段 %v 不存在", t)
 		return fmt.Sprintf("模板字段 %v 不存在", t)
 	}
 	return column
@@ -92,7 +91,7 @@ func (a *AddForm) GetTemplate(t orm.FieldType) string {
 func (a *AddForm) GetFunc(t orm.FieldType) func(text string, tmp []string) string {
 	function, ok := addFuncMap[t]
 	if !ok {
-		log.Error("模板字段 %v 不存在", a)
+		slog.Error("模板字段 %v 不存在", a)
 	}
 	return function
 }

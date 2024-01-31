@@ -2,12 +2,11 @@ package editform
 
 import (
 	"fmt"
+	"log/slog"
 	"strings"
 
 	orm "github.com/lflxp/djangolang/consted"
 	"github.com/lflxp/djangolang/utils/orm/sqlite"
-
-	log "github.com/go-eden/slf4go"
 )
 
 // 编辑表单
@@ -16,9 +15,9 @@ type EditForm struct{}
 // 按照表字段循环生成所有表单字段
 func (f *EditForm) Transfer() interface{} {
 	return func(data map[string]string, id, name string) string {
-		log.Debugf("Raw EditForm id %s data %v\n", id, data)
+		slog.Debug("Raw EditForm id %s data %v\n", id, data)
 		if err := f.Check(data, id, name); err != nil {
-			log.Error(err.Error())
+			slog.Error(err.Error())
 			return ""
 		}
 
@@ -27,7 +26,7 @@ func (f *EditForm) Transfer() interface{} {
 		check_sql := fmt.Sprintf("select * from %s where id=%s", name, id)
 		db_result, err := sqlite.NewOrm().Query(check_sql)
 		if err != nil {
-			log.Error(err.Error())
+			slog.Error(err.Error())
 			return err.Error()
 		}
 
@@ -63,7 +62,7 @@ func (f *EditForm) Transfer() interface{} {
 				case string(orm.OneToMany):
 					result += f.GetFunc(orm.OneToMany)(f.GetTemplate(orm.MultiSelect), tmp, db_result[0])
 				default:
-					log.Errorf("not found field type: %s", tmp[1])
+					slog.Error("not found field type: %s", tmp[1])
 				}
 			}
 		}
@@ -73,26 +72,26 @@ func (f *EditForm) Transfer() interface{} {
 
 // 检查并赋值参数
 func (f *EditForm) Check(data map[string]string, id, name string) error {
-	log.Debugf("EditForm Check id %s name %s data: %v", id, name, data)
+	slog.Debug("EditForm Check id %s name %s data: %v", id, name, data)
 	if value, ok := data["Col"]; ok {
-		log.Debug("edit Col ", value)
+		slog.Debug("edit Col ", value)
 	} else {
 		return fmt.Errorf("edit Col is empty")
 	}
 
 	// if value, ok := data["List"]; ok {
-	// 	log.Debug("List ", value)
+	// 	slog.Debug("List ", value)
 	// }
 	// if value, ok := data["Search"]; ok {
-	// 	log.Debug("Search ", value)
+	// 	slog.Debug("Search ", value)
 	// }
 	if name == "" {
-		log.Error("Table name is empty")
+		slog.Error("Table name is empty")
 		return fmt.Errorf("Table name is empty")
 	}
 
 	if id == "" {
-		log.Error("id is empty")
+		slog.Error("id is empty")
 		return fmt.Errorf("id is empty")
 	}
 
@@ -102,7 +101,7 @@ func (f *EditForm) Check(data map[string]string, id, name string) error {
 func (f *EditForm) GetTemplate(t orm.FieldType) string {
 	column, ok := editColumns[t]
 	if !ok {
-		log.Error("模板字段 %v 不存在", t)
+		slog.Error("模板字段 %v 不存在", t)
 		return fmt.Sprintf("模板字段 %v 不存在", t)
 	}
 	return column
@@ -111,7 +110,7 @@ func (f *EditForm) GetTemplate(t orm.FieldType) string {
 func (f *EditForm) GetFunc(t orm.FieldType) func(text string, tmp []string, data map[string][]byte) string {
 	function, ok := editFuncMap[t]
 	if !ok {
-		log.Error("模板字段 %v 不存在", f)
+		slog.Error("模板字段 %v 不存在", f)
 	}
 	return function
 }

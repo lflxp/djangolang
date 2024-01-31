@@ -2,6 +2,7 @@ package djangolang
 
 import (
 	"fmt"
+	"log/slog"
 	"net/http"
 	"path/filepath"
 	"strconv"
@@ -18,7 +19,6 @@ import (
 	"github.com/lflxp/djangolang/utils/orm/sqlite"
 
 	"github.com/gin-gonic/gin"
-	log "github.com/go-eden/slf4go"
 )
 
 func init() {
@@ -28,7 +28,7 @@ func init() {
 	user := model.User{Username: "admin"}
 	has, err := sqlite.NewOrm().Get(&user)
 	if err != nil {
-		log.Error(err)
+		slog.Error(err.Error())
 	}
 
 	if !has {
@@ -40,13 +40,13 @@ func init() {
 
 		sqlite.NewOrm().Insert(&claims)
 
-		log.Info("init admin user")
+		slog.Info("init admin user")
 		sql := "insert into user('username','password','claims_id') values ('admin','admin','1');"
 		n, err := sqlite.NewOrm().Query(sql)
 		if err != nil {
-			log.Errorf("init admin user err %s", err.Error())
+			slog.Error("init admin user err %s", err.Error())
 		}
-		log.Infof("insert admin user count: %d", len(n))
+		slog.Info("insert admin user count: %d", len(n))
 	}
 }
 
@@ -142,13 +142,13 @@ func process(c *gin.Context) {
 		} else if typed == "add" {
 			data := map[string]interface{}{}
 			name := c.Query("name")
-			log.Debug("add name ", name)
+			slog.Debug("add name ", name)
 			if name != "" {
 				data["Col"] = GetRegisterByName(name)
 				// data["File"] = false
 				columns := []raw.Upload{}
 				for _, value := range strings.Split(strings.TrimSpace(GetRegisterByName(name)["Col"]), " ") {
-					// log.Debugf("index %d value %s", index, value)
+					// slog.Debugf("index %d value %s", index, value)
 					tmp := strings.Split(strings.TrimSpace(value), ":")
 					// if tmp[1] == "file" {
 					// 	data["File"] = true
@@ -162,7 +162,7 @@ func process(c *gin.Context) {
 					columns = append(columns, tmp_col)
 				}
 				data["Columns"] = columns
-				// log.Debugf("Colums is %v", columns)
+				// slog.Debugf("Colums is %v", columns)
 			}
 			data["Up"] = components.NewComponentAdaptor(consted.Upload).Transfer().(func(map[string]string) string)(GetRegisterByName(name))
 			data["Data"] = GetRegistered()
@@ -222,7 +222,7 @@ func process(c *gin.Context) {
 
 				columns := []raw.Upload{}
 				for index, value := range strings.Split(strings.TrimSpace(GetRegisterByName(name)["Col"]), " ") {
-					log.Debugf("index %d value %s", index, value)
+					slog.Debug(fmt.Sprintf("index %d value %s", index, value))
 					tmp := strings.Split(strings.TrimSpace(value), ":")
 					// if tmp[1] == "file" {
 					// 	data["File"] = true
@@ -236,7 +236,7 @@ func process(c *gin.Context) {
 					columns = append(columns, tmp_col)
 				}
 				Data["Columns"] = columns
-				log.Debugf("Colums is %v", columns)
+				slog.Debug(fmt.Sprintf("Colums is %v", columns))
 			}
 			Data["Data"] = GetRegistered()
 			Data["User"] = "Boss"
@@ -255,7 +255,7 @@ func process(c *gin.Context) {
 			// 获取字段类型
 			columnsType := map[string]string{}
 			for _, v := range strings.Split(strings.TrimSpace(searchs["Col"]), " ") {
-				// log.Infof("vvvv is %s", v)
+				// slog.Infof("vvvv is %s", v)
 				tmp := strings.Split(strings.TrimSpace(v), ":")
 				columnsType[strings.ToLower(tmp[2])] = tmp[1]
 			}
@@ -263,7 +263,7 @@ func process(c *gin.Context) {
 			if search == "" {
 				sql = fmt.Sprintf("select * from %s order by id %s", strings.ToLower(name), order)
 			} else {
-				log.Debug("searchs", searchs)
+				slog.Debug("searchs", searchs)
 				if searchs != nil {
 					if strings.Contains(searchs["Search"], ",") {
 						tmp := []string{}
@@ -280,14 +280,14 @@ func process(c *gin.Context) {
 			if offset != "" && limit != "" {
 				sql = fmt.Sprintf("%s limit %s offset %s", sql, limit, offset)
 			}
-			log.Debug(sql)
+			slog.Debug(sql)
 			result, err := sqlite.NewOrm().Query(sql)
 			if err != nil {
-				log.Error(err.Error())
+				slog.Error(err.Error())
 			}
 			total, err := sqlite.NewOrm().Table(strings.ToLower(name)).Count()
 			if err != nil {
-				log.Error(err.Error())
+				slog.Error(err.Error())
 			}
 			ttt := map[string]interface{}{}
 			t2 := []map[string]string{}
@@ -296,17 +296,17 @@ func process(c *gin.Context) {
 				for key, value := range x {
 					// result[n][key] = string(value)
 					// 判断字段类型
-					// log.Debugf("=== 字段类型 %v key %s value %s", columnsType, key, value)
+					// slog.Debugf("=== 字段类型 %v key %s value %s", columnsType, key, value)
 					if types, ok := columnsType[strings.ToLower(key)]; ok {
 						if types == "file" {
-							// log.Debugf("====== FILE === data key %s value %s", key, value)
+							// slog.Debugf("====== FILE === data key %s value %s", key, value)
 							if len(value) > 5 {
 								tmp[strings.ToLower(key)] = fmt.Sprintf(`<a href="/%s" target="_self" download>下载</a>`, string(value))
 							} else {
 								tmp[strings.ToLower(key)] = "-"
 							}
 						} else {
-							// log.Debugf("====== NOT FILE === data key %s value %s", key, value)
+							// slog.Debugf("====== NOT FILE === data key %s value %s", key, value)
 							tmp[strings.ToLower(key)] = string(value)
 						}
 					}
@@ -337,7 +337,7 @@ func process(c *gin.Context) {
 				Name: name,
 				Op:   fmt.Sprintf("Delete Id %s", ids),
 			}
-			log.Debug(ids, name)
+			slog.Debug(ids, name)
 			sql := fmt.Sprintf("delete from %s where id in (%s)", name, ids)
 			_, err := sqlite.NewOrm().Query(sql)
 			if err != nil {
@@ -354,7 +354,7 @@ func process(c *gin.Context) {
 
 			name := c.Query("table")
 			coldata := GetRegisterByName(name)
-			// log.Debugf("================= coldata is %v", coldata)
+			// slog.Debugf("================= coldata is %v", coldata)
 			colList := []string{}
 			valueList := []string{}
 			for _, x := range strings.Split(strings.TrimSpace(coldata["Col"]), " ") {
@@ -364,7 +364,7 @@ func process(c *gin.Context) {
 				} else if tmp[1] == "file" {
 					file, err := c.FormFile(tmp[2])
 					if err != nil {
-						log.Error(err)
+						slog.Error(err.Error())
 						c.String(400, "file upload error %v", err.Error())
 						return
 					}
@@ -383,26 +383,26 @@ func process(c *gin.Context) {
 					fileName := fmt.Sprintf("%s_%s", file.Filename, fileNameStr)
 					//保存上传文件
 					filePath := filepath.Join(utils.Mkdir("upload"), "/", fileName)
-					log.Debugf("=================上传文件 %s size %d name %s", filePath, file.Size, file.Filename, fileName)
+					slog.Debug(fmt.Sprintf("=================上传文件 %s size %d name %s", filePath, file.Size, file.Filename, fileName))
 					c.SaveUploadedFile(file, filePath)
 					colList = append(colList, tmp[2])
 					valueList = append(valueList, fmt.Sprintf("'%s'", filePath))
 				} else {
 					tt := c.PostForm(tmp[2])
-					// log.Debugf("postForm %s is %s", tmp[2], tt)
+					// slog.Debugf("postForm %s is %s", tmp[2], tt)
 					colList = append(colList, tmp[2])
 					valueList = append(valueList, fmt.Sprintf("'%s'", tt))
 				}
 			}
 
-			// log.Error(string(this.Ctx.Input.RequestBody))
+			// slog.Error(string(this.Ctx.Input.RequestBody))
 			//获取字段和所有值
 			// bs, err := io.ReadAll(c.Request.Body)
 			// if err != nil {
 			// 	c.String(400, err.Error())
 			// 	return
 			// }
-			// log.Debugf("================= bs is %s", string(bs))
+			// slog.Debugf("================= bs is %s", string(bs))
 			// body := strings.Replace(string(bs), "&_save=%E4%BF%9D%E5%AD%98", "", -1)
 			// body = strings.Replace(body, "%5B%5D", "", -1)
 			// parseBody, err := url.Parse(body)
@@ -410,10 +410,10 @@ func process(c *gin.Context) {
 			// 	c.String(400, err.Error())
 			// 	return
 			// }
-			// log.Error(parseBody.Path)
+			// slog.Error(parseBody.Path)
 			// l, err := url.ParseQuery(parseBody.Path)
 			// if err != nil {
-			// 	log.Error(err.Error())
+			// 	slog.Error(err.Error())
 			// 	c.String(400, err.Error())
 			// 	return
 			// }
@@ -429,7 +429,7 @@ func process(c *gin.Context) {
 			}
 
 			sql := fmt.Sprintf("insert into %s(%s) values (%s)", name, strings.Join(colList, ","), strings.Join(valueList, ","))
-			log.Debug(sql)
+			slog.Debug(sql)
 			_, err := sqlite.NewOrm().Query(sql)
 			if err != nil {
 				history.Common = err.Error()
@@ -488,17 +488,17 @@ func process(c *gin.Context) {
 				// 	c.String(400, err.Error())
 				// 	return
 				// }
-				// // log.Error(parseBody.Path)
+				// // slog.Error(parseBody.Path)
 				// l, err := url.ParseQuery(parseBody.Path)
 				// if err != nil {
-				// 	log.Error(err.Error())
+				// 	slog.Error(err.Error())
 				// 	history.Common = err.Error()
 				// 	c.String(400, err.Error())
 				// 	return
 				// }
 
 				coldata := GetRegisterByName(name)
-				log.Debugf("================= coldata is %v", coldata)
+				slog.Debug(fmt.Sprintf("================= coldata is %v", coldata))
 				colList := []string{}
 				valueList := []string{}
 				for _, x := range strings.Split(strings.TrimSpace(coldata["Col"]), " ") {
@@ -508,7 +508,7 @@ func process(c *gin.Context) {
 					} else if tmp[1] == "file" {
 						file, err := c.FormFile(tmp[2])
 						if err != nil {
-							log.Error(err)
+							slog.Error(err.Error())
 							c.String(400, "file upload error %v", err.Error())
 							return
 						}
@@ -527,13 +527,13 @@ func process(c *gin.Context) {
 						fileName := fmt.Sprintf("%s_%s", file.Filename, fileNameStr)
 						//保存上传文件
 						filePath := filepath.Join(utils.Mkdir("upload"), "/", fileName)
-						log.Debugf("=================上传文件 %s size %d name %s", filePath, file.Size, file.Filename, fileName)
+						slog.Debug(fmt.Sprintf("=================上传文件 %s size %d name %s", filePath, file.Size, file.Filename, fileName))
 						c.SaveUploadedFile(file, filePath)
 						colList = append(colList, tmp[2])
 						valueList = append(valueList, filePath)
 					} else {
 						tt := c.PostForm(tmp[2])
-						log.Debugf("postForm %s is %s", tmp[2], tt)
+						slog.Debug(fmt.Sprintf("postForm %s is %s", tmp[2], tt))
 						colList = append(colList, tmp[2])
 						valueList = append(valueList, tt)
 					}
@@ -550,7 +550,7 @@ func process(c *gin.Context) {
 				_, err := sqlite.NewOrm().Query(sql)
 				if err != nil {
 					history.Common = err.Error()
-					log.Errorf("sql %s error %s", sql, err.Error())
+					slog.Error(fmt.Sprintf("sql %s error %s", sql, err.Error()))
 					c.String(400, err.Error())
 					return
 				}

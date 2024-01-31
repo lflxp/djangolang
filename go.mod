@@ -1,13 +1,12 @@
 module github.com/lflxp/djangolang
 
-go 1.20
+go 1.21.6
 
 require (
 	github.com/alecthomas/kingpin/v2 v2.3.2
 	github.com/appleboy/gin-jwt/v2 v2.9.1
 	github.com/gin-contrib/gzip v0.0.6
 	github.com/gin-gonic/gin v1.9.1
-	github.com/go-eden/slf4go v1.1.2
 	github.com/go-kit/log v0.2.1
 	github.com/guonaihong/gout v0.3.9
 	github.com/mozillazg/go-pinyin v0.20.0
@@ -15,10 +14,10 @@ require (
 	github.com/prometheus/client_golang v1.17.0
 	github.com/prometheus/common v0.45.0
 	github.com/prometheus/node_exporter v1.7.0
-	github.com/sirupsen/logrus v1.9.3
 	github.com/skratchdot/open-golang v0.0.0-20200116055534-eef842397966
 	github.com/swaggo/files v1.0.1
 	github.com/swaggo/gin-swagger v1.6.0
+	github.com/swaggo/swag v1.16.2
 	k8s.io/client-go v0.29.0
 	k8s.io/metrics v0.29.0
 	modernc.org/sqlite v1.20.1
@@ -44,8 +43,6 @@ require (
 	github.com/emicklei/go-restful/v3 v3.11.0 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.2 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
-	github.com/go-eden/common v0.1.14 // indirect
-	github.com/go-eden/routine v1.0.2 // indirect
 	github.com/go-logfmt/logfmt v0.5.1 // indirect
 	github.com/go-logr/logr v1.3.0 // indirect
 	github.com/go-openapi/jsonpointer v0.20.2 // indirect
@@ -99,7 +96,6 @@ require (
 	github.com/remyoudompheng/bigfft v0.0.0-20200410134404-eec4a21b6bb0 // indirect
 	github.com/safchain/ethtool v0.3.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
-	github.com/swaggo/swag v1.16.2 // indirect
 	github.com/syndtr/goleveldb v1.0.0 // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/ugorji/go/codec v1.2.11 // indirect

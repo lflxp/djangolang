@@ -2,10 +2,10 @@ package metrics
 
 import (
 	"flag"
+	"log/slog"
 	"path/filepath"
 	"sync"
 
-	log "github.com/go-eden/slf4go"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/util/homedir"
@@ -23,7 +23,7 @@ func InitClientMetrics() (*versioned.Clientset, error) {
 		clientsMetrics, err = doMetricsInit()
 		if err != nil {
 			clientsMetrics, err = doMetricsInnerInit()
-			log.Debugf("init out of cluster: %v", err)
+			slog.Debug("init out of cluster", "Error", err.Error())
 			if err != nil {
 				panic(err)
 			}

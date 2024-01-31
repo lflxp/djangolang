@@ -1,10 +1,10 @@
 package sqlite
 
 import (
+	"log/slog"
 	"path/filepath"
 	"sync"
 
-	log "github.com/go-eden/slf4go"
 	"k8s.io/client-go/util/homedir"
 	_ "modernc.org/sqlite"
 	"xorm.io/core"
@@ -23,7 +23,7 @@ var (
 
 func NewOrm() *xorm.Engine {
 	if dbname == "" || driverName == "" {
-		log.Debug("Dbname or DriverName is empty")
+		slog.Debug("Dbname or DriverName is empty")
 		home := homedir.HomeDir()
 		dbname = ".djangolang.db"
 		dataResourceName = filepath.Join(home, dbname)

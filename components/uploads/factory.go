@@ -2,9 +2,8 @@ package uploads
 
 import (
 	"fmt"
+	"log/slog"
 	"strings"
-
-	log "github.com/go-eden/slf4go"
 )
 
 // string转html
@@ -22,13 +21,13 @@ func (u *Uploads) Transfer() interface{} {
 		// Id:int64:id: Country:string:Country: Zoom:string:Zoom: Company:string:Company: Items:string:Items: Production:string:Production:
 		// Count:string:Count: Serial:string:Serial: Extend:string:Extend: 上传文件:file:file:
 		if value, ok := data["Col"]; !ok {
-			log.Errorf("%v not contains Col key", data)
+			slog.Error("%v not contains Col key", data)
 			return fmt.Sprintf("%v not contains Col key", data)
 		} else {
 			for index, v := range strings.Split(strings.TrimSpace(value), " ") {
 				tmp := strings.Split(v, ":")
 				if len(tmp) < 3 {
-					log.Errorf("upload %v format error, length is %d", v, len(tmp))
+					slog.Error("upload %v format error, length is %d", v, len(tmp))
 				}
 
 				if tmp[1] == "file" {

@@ -2,13 +2,12 @@ package editform
 
 import (
 	"fmt"
+	"log/slog"
 	"strings"
 	"time"
 
 	orm "github.com/lflxp/djangolang/consted"
 	"github.com/lflxp/djangolang/utils/orm/sqlite"
-
-	log "github.com/go-eden/slf4go"
 )
 
 // 编辑表单字段
@@ -158,7 +157,7 @@ var editFuncMap = map[orm.FieldType]func(string, []string, map[string][]byte) st
 		// log.Error(sql)
 		resultSql, err := sqlite.NewOrm().Query(sql)
 		if err != nil {
-			log.Error(err.Error())
+			slog.Error(err.Error())
 		}
 		showCol := strings.Split(fmt.Sprintf("id,%s", tmp_o2o[1]), ",")
 		for _, x := range resultSql {
@@ -186,9 +185,8 @@ var editFuncMap = map[orm.FieldType]func(string, []string, map[string][]byte) st
 		// log.Error(sql)
 		resultSql, err := sqlite.NewOrm().Query(sql)
 		if err != nil {
-			log.Error(err.Error())
+			slog.Error(err.Error())
 		}
-		log.Debug(resultSql)
 		showCol := strings.Split(tmp_o2o[1], ",")
 		for _, x := range resultSql {
 			var t_s string

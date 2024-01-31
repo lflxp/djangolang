@@ -4,6 +4,7 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
+	"log/slog"
 	"net/http"
 	"os"
 	"os/signal"
@@ -15,7 +16,6 @@ import (
 
 	"github.com/gin-contrib/gzip"
 	"github.com/gin-gonic/gin"
-	log "github.com/go-eden/slf4go"
 	"github.com/lflxp/djangolang/examples/allinone/demo"
 	_ "github.com/lflxp/djangolang/examples/allinone/docs"
 	"github.com/skratchdot/open-golang/open"
@@ -57,7 +57,7 @@ func Run(args *Args) {
 	demo.RegisterDemo(GinEngine)
 	demo.RegisterVpn(GinEngine)
 	djangolang.RegisterControllerAdmin(GinEngine, true)
-	log.Infof("ip %s port %s", args.Host, args.Port)
+	slog.Info("ip %s port %s", args.Host, args.Port)
 
 	if args.Host == "" {
 		// instance.Fatal("Check Host or Port config already!!!")
@@ -106,18 +106,18 @@ func Run(args *Args) {
 
 	go func() {
 		<-quit
-		log.Warn("receive interrupt signal")
+		slog.Warn("receive interrupt signal")
 		if err := server.Close(); err != nil {
-			log.Fatal("Server Close:", err)
+			slog.Error("Server Close:", err)
 		}
 	}()
 
 	var openUrl string
 	for index, ip := range utils.GetIPs() {
 		if args.IsHttps {
-			log.Infof("Listening and serving HTTPS on https://%s:%s", ip, args.Port)
+			slog.Info("Listening and serving HTTPS on https://%s:%s", ip, args.Port)
 		} else {
-			log.Infof("Listening and serving HTTPS on http://%s:%s", ip, args.Port)
+			slog.Info("Listening and serving HTTPS on http://%s:%s", ip, args.Port)
 		}
 
 		if index == 0 {
@@ -130,9 +130,9 @@ func Run(args *Args) {
 		}
 		if err := server.ListenAndServeTLS("ca.crt", "ca.key"); err != nil {
 			if err == http.ErrServerClosed {
-				log.Warn("Server closed under request")
+				slog.Warn("Server closed under request")
 			} else {
-				log.Fatalf("Server closed unexpect %s", err.Error())
+				slog.Error("Server closed unexpect %s", err.Error())
 			}
 		}
 	} else {
@@ -141,14 +141,14 @@ func Run(args *Args) {
 		}
 		if err := server.ListenAndServe(); err != nil {
 			if err == http.ErrServerClosed {
-				log.Warn("Server closed under request")
+				slog.Warn("Server closed under request")
 			} else {
-				log.Fatalf("Server closed unexpect %s", err.Error())
+				slog.Error("Server closed unexpect %s", err.Error())
 			}
 		}
 	}
 
-	log.Warn("Server exiting")
+	slog.Warn("Server exiting")
 }
 
 func main() {
