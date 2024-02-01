@@ -40,13 +40,12 @@ func init() {
 
 		sqlite.NewOrm().Insert(&claims)
 
-		slog.Info("init admin user")
-		sql := "insert into user('username','password','claims_id') values ('admin','admin','1');"
+		sql := "insert into user('username','password') values ('admin','admin');"
 		n, err := sqlite.NewOrm().Query(sql)
 		if err != nil {
-			slog.Error("init admin user err %s", err.Error())
+			slog.Error("init admin user", "err", err.Error(), "sql", sql)
 		}
-		slog.Info("insert admin user count: %d", len(n))
+		slog.Debug("insert admin user", "count", len(n), "sql", sql)
 	}
 }
 

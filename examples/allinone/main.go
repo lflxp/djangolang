@@ -22,6 +22,7 @@ import (
 )
 
 var GinEngine *gin.Engine
+var lvl slog.LevelVar
 
 type Args struct {
 	Host        string
@@ -36,6 +37,14 @@ type Args struct {
 }
 
 func Run(args *Args) {
+	// 配置日志
+	lvl.Set(slog.LevelDebug)
+	opts := slog.HandlerOptions{
+		AddSource: true,
+		Level:     &lvl,
+	}
+
+	slog.SetDefault(slog.New((slog.NewTextHandler(os.Stdout, &opts))))
 	// gin.SetMode(gin.ReleaseMode)
 	GinEngine = gin.Default()
 
