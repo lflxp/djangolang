@@ -52,12 +52,15 @@ func Run(args *Args) {
 	})
 	// 设置swagger
 	middlewares.RegisterSwaggerMiddleware(GinEngine)
-	middlewares.RegisterNodeExporter(GinEngine)
+	// 基础metrics
+	middlewares.RegisterPrometheusMiddleware(GinEngine, false)
+	// 高级metrics
+	// middlewares.RegisterNodeExporter(GinEngine)
 	Registertest(GinEngine)
 	demo.RegisterDemo(GinEngine)
 	demo.RegisterVpn(GinEngine)
 	djangolang.RegisterControllerAdmin(GinEngine, true)
-	slog.Info("ip %s port %s", args.Host, args.Port)
+	slog.Info(fmt.Sprintf("ip %s port %s", args.Host, args.Port))
 
 	if args.Host == "" {
 		// instance.Fatal("Check Host or Port config already!!!")
@@ -115,9 +118,9 @@ func Run(args *Args) {
 	var openUrl string
 	for index, ip := range utils.GetIPs() {
 		if args.IsHttps {
-			slog.Info("Listening and serving HTTPS on https://%s:%s", ip, args.Port)
+			slog.Info(fmt.Sprintf("Listening and serving HTTPS on https://%s:%s", ip, args.Port))
 		} else {
-			slog.Info("Listening and serving HTTPS on http://%s:%s", ip, args.Port)
+			slog.Info(fmt.Sprintf("Listening and serving HTTPS on http://%s:%s", ip, args.Port))
 		}
 
 		if index == 0 {
